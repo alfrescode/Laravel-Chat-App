@@ -15,6 +15,7 @@ export default function Inbox({ messages, auth, users }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentMessage, setCurrentMessage] = useState([]);
     const [messageInput, setMessageInput] = useState("");
+    const [darkMode, setDarkMode] = useState(false);
 
     const selectedUserRef = useRef(null);
     const scrollToBottomRef = useRef(null);
@@ -81,15 +82,24 @@ export default function Inbox({ messages, auth, users }) {
         }
     };
 
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Inbox" />
 
-            <div className="h-screen flex bg-gray-100" style={{ height: "calc(100vh - 4rem)" }}>
+            <div className={`h-screen flex ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`} style={{ height: "calc(100vh - 4rem)" }}>
                 {/* Sidebar */}
-                <div className="w-1/4 bg-white border-r border-gray-200">
-                    <div className="p-4 border-b border-gray-200">
-                        Inbox
+                <div className={`w-1/4 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <div className="flex justify-between items-center">
+                            <span>Inbox</span>
+                            <button onClick={toggleDarkMode} className="text-sm">
+                                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                            </button>
+                        </div>
                     </div>
                     <div className="p-4 space-y-4">
                         {/* Contact List */}
@@ -97,7 +107,7 @@ export default function Inbox({ messages, auth, users }) {
                             <div
                                 key={key}
                                 onClick={() => setSelectedUser(user)}
-                                className={`flex items-center ${user.id == selectedUser?.id ? 'bg-gray-200' : ''}`}
+                                className={`flex items-center p-2 rounded-lg cursor-pointer ${user.id == selectedUser?.id ? (darkMode ? 'bg-gray-700' : 'bg-gray-200') : ''}`}
                             >
                                 <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                                 <div className="ml-4">
@@ -117,7 +127,7 @@ export default function Inbox({ messages, auth, users }) {
                     {selectedUser &&
                         <>
                             {/* Chat Header */}
-                            <div className="p-4 border-b border-gray-200 flex items-center">
+                            <div className={`p-4 border-b flex items-center ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                 <div className="w-12 h-12 bg-blue-200 rounded"></div>
                                 <div className="ml-4">
                                     <div className="font-bold">{selectedUser.name}</div>
@@ -126,8 +136,8 @@ export default function Inbox({ messages, auth, users }) {
                             {/* Chat Body */}
                             <div className="flex-1 p-4 overflow-y-auto">
                                 {currentMessage.map((message, key) => (
-                                    <div key={key} className={`flex ${message.sender_id == auth.user.id ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`p-2 rounded-lg ${message.sender_id == auth.user.id ? 'bg-blue-200' : 'bg-gray-200'}`}>
+                                    <div key={key} className={`p-1 flex ${message.sender_id == auth.user.id ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`p-2 rounded-lg max-w-xs ${message.sender_id == auth.user.id ? (darkMode ? 'bg-blue-600' : 'bg-blue-200') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}>
                                             {message.message}
                                         </div>
                                     </div>
@@ -135,18 +145,18 @@ export default function Inbox({ messages, auth, users }) {
                                 <div ref={scrollToBottomRef}></div>
                             </div>
                             {/* Chat Footer */}
-                            <div className="p-4 border-t border-gray-200">
+                            <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                 <div className="flex items-center">
                                     <input
                                         type="text"
                                         value={messageInput}
                                         onChange={(e) => setMessageInput(e.target.value)}
                                         onKeyDown={handleKeyDown}
-                                        className="flex-1 p-2 border border-gray-200 rounded-lg"
+                                        className={`flex-1 p-2 rounded-lg ${darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-black border-gray-200'}`}
                                     />
                                     <button
                                         onClick={sendMessage}
-                                        className="ml-2 bg-blue-500 text-white p-2 rounded-lg"
+                                        className={`ml-2 p-2 rounded-lg ${darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'}`}
                                     >
                                         Send
                                     </button>
