@@ -1,36 +1,57 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
+use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class MessageController extends Controller
 {
+    public function index()
+    {
+        return Inertia::render('Inbox', [
+            'auth' => ['user' => Auth::user()],
+            'users' => User::all(),
+            'messages' => [],
+        ]);
+    }
+
     public function inbox() {
-        $users = User::where('id', '!=', Auth::user()->id())->get();
-        return Inertia::render('Inbox', ['users' => $users]);
+        $users = User::where('id', '!=', Auth::id())->get();
+        return Inertia::render('Inbox', [
+            'users' => $users,
+            'auth' => Auth::user()
+        ]);
     }
 
-    public function store(Request $request, User $user) {
-        $message = new Messsage;
-        $message->sender_id = Auth::user()->id();
-        $message->recipient_id = $user->id;
-        $message->message = $request->message;
-        $message->save();
+    public function sendMessage(Request $request, User $user)
+    {
+        $request->validate([
+            'message' => 'required|string',
+        ]);
 
-        broadcast(new MessageSent($message));
+        $message = Message::create([
+            'sender_id' => Auth::id(),
+            'receiver_id' => $user->id,
+            'message' => $request->message,
+        ]);
 
-        return response()->json($message);
+        broadcast(new MessageSent($message))->toOthers();
+
+        return response()->json($message, 201);
     }
 
-    public function show(User $user) {
-        $user1Id = Auth::user()->id();
+    public function getMessages(User $user) {
+        $user1Id = Auth::id();
         $user2Id = $user->id;
 
         $messages = Message::where(function($query) use ($user1Id, $user2Id) {
-            $query->where('sender_id', $user1Id)->where('recipient_id', $user2Id);
+            $query->where('sender_id', $user1Id)->where('receiver_id', $user2Id);
         })->orWhere(function($query) use ($user1Id, $user2Id) {
-            $query->where('sender_id', $user2Id)->where('recipient_id', $user1Id);
+            $query->where('sender_id', $user2Id)->where('receiver_id', $user1Id);
         })
         ->orderBy('created_at', 'asc')
         ->get();
