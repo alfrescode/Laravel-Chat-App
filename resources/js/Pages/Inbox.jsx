@@ -109,7 +109,7 @@ export default function Inbox({ messages, auth, users }) {
                                 onClick={() => setSelectedUser(user)}
                                 className={`flex items-center p-2 rounded-lg cursor-pointer ${user.id == selectedUser?.id ? (darkMode ? 'bg-gray-700' : 'bg-gray-200') : ''}`}
                             >
-                                <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                                <img src={user.avatar ? `/storage/${user.avatar}` : '/default-avatar.png'} alt="Avatar" className="w-12 h-12 rounded-full" />
                                 <div className="ml-4">
                                     <div className="font-semibold">{user.name}</div>
                                 </div>
@@ -128,7 +128,7 @@ export default function Inbox({ messages, auth, users }) {
                         <>
                             {/* Chat Header */}
                             <div className={`p-4 border-b flex items-center ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                <div className="w-12 h-12 bg-blue-200 rounded"></div>
+                                <img src={selectedUser.avatar ? `/storage/${selectedUser.avatar}` : '/default-avatar.png'} alt="Avatar" className="w-12 h-12 rounded-full" />
                                 <div className="ml-4">
                                     <div className="font-bold">{selectedUser.name}</div>
                                 </div>
@@ -138,7 +138,8 @@ export default function Inbox({ messages, auth, users }) {
                                 {currentMessage.map((message, key) => (
                                     <div key={key} className={`p-1 flex ${message.sender_id == auth.user.id ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`p-2 rounded-lg max-w-xs ${message.sender_id == auth.user.id ? (darkMode ? 'bg-blue-600' : 'bg-blue-200') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}>
-                                            {message.message}
+                                            <div>{message.message}</div>
+                                            <div className="text-xs text-gray-500 mt-1">{new Date(message.created_at).toLocaleTimeString()}</div>
                                         </div>
                                     </div>
                                 ))}

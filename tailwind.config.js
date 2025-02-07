@@ -9,7 +9,7 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/js/**/*.jsx',
     ],
-    darkMode: 'class',
+    darkMode: 'class', // Habilita el modo oscuro usando la clase 'dark'
     theme: {
         extend: {
             fontFamily: {
