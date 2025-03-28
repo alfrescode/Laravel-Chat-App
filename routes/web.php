@@ -24,6 +24,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox', [MessageController::class, 'index'])->name('inbox');
     Route::post('/inbox/{user}', [MessageController::class, 'sendMessage']);
     Route::get('/inbox/{user}', [MessageController::class, 'getMessages']);
+
+    Route::get('/notifications/unread', function () {
+        return auth()->user()->unreadNotifications;
+    })->name('notifications.unread');
+    
+    Route::post('/notifications/mark-as-read/{id}', function ($id) {
+        auth()->user()->notifications()->findOrFail($id)->markAsRead();
+        return response()->noContent();
+    })->name('notifications.markAsRead');
 });
 
 require __DIR__.'/auth.php';
